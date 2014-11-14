@@ -227,7 +227,7 @@ class LiveMapController extends MapController
 
     loginName = @authService.getUser()?.login
     v.isMine = loginName == mission?.userName
-    @log.debug("#{mission?.userName} #{mission?.id} vs #{loginName} isMine=#{v.isMine}")
+    #@log.debug("#{mission?.userName} #{mission?.id} vs #{loginName} isMine=#{v.isMine}")
     v.icon =
         iconUrl:
           if v.isMine
