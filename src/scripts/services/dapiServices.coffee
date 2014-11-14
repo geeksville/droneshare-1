@@ -114,9 +114,10 @@ class RESTService extends DapiService
 
 class AuthService extends RESTService
 
-  @$inject: ['$log', '$http', '$routeParams']
-  constructor: (log, http, routeParams) ->
+  @$inject: ['$log', '$http', '$routeParams', 'hullService']
+  constructor: (log, http, routeParams, @hull) ->
     super(log, http, routeParams)
+    @hull.init()
     @setLoggedOut() # Preinit user
     @checkLogin() # Do an initial fetch
 
