@@ -40,7 +40,7 @@ class DapiService
   @$inject: ['$log', '$http', '$routeParams']
   constructor: (@log, @http, routeParams) ->
     useLocalServer = routeParams.local ? false
-    #useLocalServer = true
+    useLocalServer = true
     base = if useLocalServer
       'http://localhost:8080'
     else
@@ -117,7 +117,6 @@ class AuthService extends RESTService
   @$inject: ['$log', '$http', '$routeParams', 'hullService']
   constructor: (log, http, routeParams, @hull) ->
     super(log, http, routeParams)
-    @hull.init()
     @setLoggedOut() # Preinit user
     @checkLogin() # Do an initial fetch
 
@@ -183,10 +182,12 @@ class AuthService extends RESTService
     @getId("user")
     .then (results) =>
       @log.debug("login complete!")
+      @hull.init(results.hullId) # Not really the right place for this, but until hull replies to my email...
       @error = null
       @setLoggedIn(results)
     , (results) =>
       @log.error("Login check failed #{results.status}: #{results.statusText}")
+      @hull.init() # Not really the right place for this, but until hull replies to my email...
       if results.status == 0
         @error = "DroneAPI server is offline, please try again later."
       @setLoggedOut()

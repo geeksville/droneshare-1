@@ -10,7 +10,7 @@ define ['https://d3f5pyioow99x0.cloudfront.net/0.8.43/hull.js'], (hullib) ->
       @loadingMessage = ''
       @loading = true
 
-    init: (@config) ->
+    init: (userHash) ->
       @setupHullEvents()
       # FIXME - understand how to use config
       @config =
@@ -18,13 +18,16 @@ define ['https://d3f5pyioow99x0.cloudfront.net/0.8.43/hull.js'], (hullib) ->
 
       if @config.loadingMessage then @loadingMessage = @config.loadingMessage
 
-      @log.info('Initing hull!!!!')
-      Hull.init
+      @log.info("Initing hull with userHash: #{userHash ? 'undefined'}")
+      hullParams =
         debug: true
         appId: "5462c12028d1a19515000ea7"
         orgUrl: "https://9beb919e.hullapp.io"
-        accessToken: "FIXME"
-      , (hull) =>
+
+      if userHash?
+        hullParams.userHash = userHash
+
+      Hull.init hullParams, (hull) =>
         @resetLoader()
       @log.info("Done init")
 
