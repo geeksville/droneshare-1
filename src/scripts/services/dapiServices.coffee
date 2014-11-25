@@ -117,6 +117,7 @@ class AuthService extends RESTService
   @$inject: ['$log', '$http', '$routeParams', 'hullService']
   constructor: (log, http, routeParams, @hull) ->
     super(log, http, routeParams)
+    @hull.init() # So we can use hull later
     @setLoggedOut() # Preinit user
     @checkLogin() # Do an initial fetch
 
@@ -169,6 +170,7 @@ class AuthService extends RESTService
   setLoggedIn: (userRecord) =>
     @user = userRecord
     @user.loggedIn = true
+    @hull.loginByToken(@user.hullId) # Tell hull
     @user
 
   setLoggedOut: () =>
@@ -182,12 +184,10 @@ class AuthService extends RESTService
     @getId("user")
     .then (results) =>
       @log.debug("login complete!")
-      @hull.init(results.hullId) # Not really the right place for this, but until hull replies to my email...
       @error = null
       @setLoggedIn(results)
     , (results) =>
       @log.error("Login check failed #{results.status}: #{results.statusText}")
-      @hull.init() # Not really the right place for this, but until hull replies to my email...
       if results.status == 0
         @error = "DroneAPI server is offline, please try again later."
       @setLoggedOut()

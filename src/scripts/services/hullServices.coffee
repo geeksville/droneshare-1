@@ -1,6 +1,7 @@
 # Based on http://blog.ninebyt.es/outsourcing-your-authentication-with-hull-io/
 
-define ['https://d3f5pyioow99x0.cloudfront.net/0.8.43/hull.js'], (hullib) ->
+define ['https://d3f5pyioow99x0.cloudfront.net/0.8.43/hull.js',
+        'https://d3f5pyioow99x0.cloudfront.net/0.8.43/hull.api.js'], (hull, hullapi) ->
   class HullService
 
     @$inject: ['$log']
@@ -10,7 +11,7 @@ define ['https://d3f5pyioow99x0.cloudfront.net/0.8.43/hull.js'], (hullib) ->
       @loadingMessage = ''
       @loading = true
 
-    init: (userHash) ->
+    init: () ->
       @setupHullEvents()
       # FIXME - understand how to use config
       @config =
@@ -23,9 +24,6 @@ define ['https://d3f5pyioow99x0.cloudfront.net/0.8.43/hull.js'], (hullib) ->
         debug: true
         appId: "5462c12028d1a19515000ea7"
         orgUrl: "https://9beb919e.hullapp.io"
-
-      if userHash?
-        hullParams.userHash = userHash
 
       Hull.init hullParams, (hull) =>
         @resetLoader()
@@ -50,6 +48,10 @@ define ['https://d3f5pyioow99x0.cloudfront.net/0.8.43/hull.js'], (hullib) ->
       @setLoader @config.loggingInMessage
       Hull.login provider
 
+    loginByToken: (accessToken) =>
+      @log.debug('Attempting access token login')
+      Hull.api('users/login', 'post', { access_token: accessToken })
+      @log.debug('Access token done')
 
     logout: =>
       setLoader @config.loggingOutMessage
@@ -63,7 +65,7 @@ define ['https://d3f5pyioow99x0.cloudfront.net/0.8.43/hull.js'], (hullib) ->
     resetLoader: =>
       # FIXME - may need apply here!
       #@scope.$apply() =>
-      @log.info("Hull init complete...")
+      @log.info("Hull login complete...")
       #@loadingMessage = ''
       #@loading = false
 
