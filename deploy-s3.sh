@@ -47,8 +47,13 @@ grunt prod
 ##
 ####
 
-BUCKETNAME=$SERVERNAME.droneshare.com
-export AWS_DEFAULT_PROFILE=3dr
+# BUCKETNAME=$SERVERNAME.droneshare.com
+# export AWS_DEFAULT_PROFILE=3dr
+
+BUCKETNAME=droneshare-html-$SERVERNAME
+export AWS_DEFAULT_PROFILE=ardupilot
+
+# We no longer create the bucket here, because the aws admin should do that...
 aws --region us-west-2 s3 mb s3://$BUCKETNAME || true
 
 # For now we limit cache time to 1hr
