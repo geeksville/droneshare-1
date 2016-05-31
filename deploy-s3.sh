@@ -24,6 +24,10 @@ if [ $SERVERNAME = production ]; then
         [Yy]* ) echo "deploying to production";;
         * ) exit -1;;
     esac
+
+    SERVERNAME=droneshare
+else
+    SERVERNAME=droneshare-$SERVERNAME
 fi
 
 ####
@@ -43,21 +47,25 @@ grunt prod
 
 ####
 ##
-## PUSH TO AWS - US-WEST-2
+## PUSH TO AWS
 ##
 ####
 
 # BUCKETNAME=$SERVERNAME.droneshare.com
 # export AWS_DEFAULT_PROFILE=3dr
 
-BUCKETNAME=droneshare-html-$SERVERNAME
+BUCKETNAME=$SERVERNAME.ardupilot.org
 export AWS_DEFAULT_PROFILE=ardupilot
 
-# We no longer create the bucket here, because the aws admin should do that...
-aws --region us-west-2 s3 mb s3://$BUCKETNAME || true
+echo Uploading to bucket $BUCKETNAME
+
+REGION=us-east-1
+
+# Try to create bucket if necessary
+aws --region $REGION s3 mb s3://$BUCKETNAME || true
 
 # For now we limit cache time to 1hr
-aws --region us-west-2 s3 sync --delete --cache-control="max-age=3600" dist s3://$BUCKETNAME
+aws --region $REGION s3 sync --delete --cache-control="max-age=3600" dist s3://$BUCKETNAME
 
 # AngularJS applications prefer to get back index.html for any bad links
 cat > s3website.json <<EOF
@@ -72,7 +80,7 @@ cat > s3website.json <<EOF
 }
 EOF
 
-aws --region us-west-2 s3api put-bucket-website --bucket $BUCKETNAME --website-configuration file://s3website.json
+aws --region $REGION s3api put-bucket-website --bucket $BUCKETNAME --website-configuration file://s3website.json
 
 cat > s3bucket-policy.json <<EOF
 {
@@ -91,7 +99,7 @@ cat > s3bucket-policy.json <<EOF
 }
 EOF
 
-aws --region us-west-2 s3api put-bucket-policy --bucket $BUCKETNAME --policy file://s3bucket-policy.json
+aws --region $REGION s3api put-bucket-policy --bucket $BUCKETNAME --policy file://s3bucket-policy.json
 echo Completed deployment
 
 ####
